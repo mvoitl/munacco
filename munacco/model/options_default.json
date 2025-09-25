@@ -1,0 +1,36 @@
+{
+  "capacity_calculation": {
+    "basecase": "opf",
+    "gsk": "gmax",
+    "include_minram": true,
+    "minram": 0.5,
+    "cne_sensitivity": 0.05,
+    "frm": 0.1
+  },
+  "validation": {
+    "include": true,
+    "vertex_selection": false,
+    "min_vertices": 2,
+    "max_vertices": 10,
+    "max_vertex_angle": 30,
+    "robust": false,
+    "epsilon": 0.05,
+    "alpha": "decision"
+  },
+  "market_model": {
+    "curtailment": true,
+    "curtailment_cost": 100,
+    "reserve_generators": false
+  },
+  "redispatch": {
+    "xb": false,
+    "xb_limit": 50,
+    "xb_cost": 50.0,
+    "rd_cost": 30.0,
+    "slack_cost": 1000000
+  },
+  "model": {
+    "print": true,
+    "precision_digits": 5
+  }
+}

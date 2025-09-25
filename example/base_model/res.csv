@@ -1,0 +1,7 @@
+name;carrier;mc;g_max;p_max_pu;sigma;bus
+wind2;wind;0.12;300;0.8;0.2;N2
+pv3;solar;0.11;50;0.7;0.2;N3
+pv4;solar;0.1;100;0.7;0;N4
+
+
+

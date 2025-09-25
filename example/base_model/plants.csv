@@ -1,0 +1,5 @@
+P;mc;g_max;bus;alpha;RD
+gas1;80;150;N1;False;True
+coal2;50;100;N2;True;True
+coal3;40;70;N3;True;True
+gas4;70;250;N4;False;True

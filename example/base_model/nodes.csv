@@ -1,0 +1,5 @@
+bus;x;y;zone;Pd;slack
+N1;0;1;Z1;150;FALSE
+N2;1;1;Z2;50;FALSE
+N3;1;0;Z2;100;TRUE
+N4;0;0;Z3;150;FALSE
