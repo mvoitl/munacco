@@ -1,0 +1,46 @@
+{
+  "capacity_calculation": {
+    "basecase": "opf",           # Method for basecase computation:
+                                 #   'opf'   = optimal power flow basecase
+                                 #   'noex'  = no exchanges between bidding zones
+                                 #   'uniform' = line constraints not considered
+    "gsk": "gmax",               # Generation shift key (GSK) method:
+                                 #   'gmax' = proportional to max capacity
+                                 #   'flat' = same share to every generator
+    "include_minram": true,      # Whether to enforce minimum remaining available margin (minRAM)
+    "minram": 0.5,               # Minimum RAM as a fraction of thermal limit (e.g. 0.5 = 50%)
+    "frm": 0.1                   # Flow reliability margin (FRM) as a fraction of capacity
+  },
+
+  "validation": {
+    "include": true,             # Run validation step (true/false)
+    "vertex_selection": true,    # INclude Vertex Selection
+    "min_vertices": 2,           # Minimum number of vertices to validate
+    "max_vertices": 10,          # Maximum number of vertices to validate
+    "max_vertex_angle": 40,      # Max. angular separation from NPF (in degrees) for vertex selection
+    "robust": false,             # Robust validation (accounts for uncertainty)
+    "epsilon": 0.05,             # Tolerance margin for robust validation (5%)
+    "alpha": "decision"          # participation factor strategy:
+                                 #   'decision' = alpha treated as decision variable
+                                 #   'gmax'     = alpha pre-computed proportional to max capacity
+  },
+
+  "market_model": {
+    "curtailment": true,         # Allow RES curtailment in market model
+    "curtailment_cost": 100,     # Cost of curtailment [€/MWh]
+    "reserve_generators": false  # Option to reserve generators in the market based on robust validation (future implementation)
+  },
+
+  "redispatch": {
+    "xb": false,                 # Allow cross-border redispatch (true/false)
+    "xb_limit": 50,              # Cross-border redispatch limit [MW]
+    "xb_cost": 50.0,             # Additional Cost of cross-border redispatch [€/MWh]
+    "rd_cost": 30.0,             # Additional Cost of internal redispatch [€/MWh]
+    "slack_cost": 1000000        # Penalty cost for infeasibilities (big-M slack variable)
+  },
+
+  "model": {
+    "print": true,               # Print solver logs and progress
+    "precision_digits": 5        # Precision for numerical results (number of digits)
+  }
+}
