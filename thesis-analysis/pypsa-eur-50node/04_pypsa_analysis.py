@@ -29,6 +29,8 @@ Outputs:
 
 import pandas as pd
 import plotly.graph_objects as go
+import plotly.io as pio
+pio.renderers.default = "browser"
 
 #%% Step 1: Load data
 
@@ -117,114 +119,121 @@ print(df_costs.to_string(index=False, float_format="%.2f"))
 
 
 #%% Step 4: Boxplot visualization
-kpis = ["market_cost", "rd_cost", "total_system_cost"]
+import pandas as pd
+import plotly.graph_objects as go
+
+# --- KPIs and colors (fill, edge, pretty label) ---
+kpis = ['market_cost', 'rd_cost', 'total_system_cost']
 kpi_colors = {
-    "market_cost": ("rgba(65,105,225,0.5)", "royalblue", "Day-Ahead Market Cost"),
-    "rd_cost": ("rgba(178,34,34,0.5)", "firebrick", "Redispatch Cost"),
-    "total_system_cost": ("rgba(147,112,219,0.5)", "mediumpurple", "Total System Cost"),
+    'market_cost': ("rgba(65,105,225,0.5)", "royalblue", "Day-Ahead Market Cost"),
+    'rd_cost': ("rgba(178,34,34,0.5)", "firebrick", "Redispatch Cost"),
+    'total_system_cost': ("rgba(147,112,219,0.5)", "mediumpurple", "Total System Cost"),
 }
 
+# --- Scenarios ---
+# --- Simplify case_titles just for x-axis labels ---
 case_titles = {
-    ("det", "low"): "Det.",
-    ("robust", "low"): "Prob.",
+    ("det", "low"):  "Det. ",
+    ("cc", "low"):   "Prob. ",
     ("det", "high"): "Det.",
-    ("robust", "high"): "Prob.",
+    ("cc", "high"):  "Prob.",
+    
 }
 
+# --- Input dict ---
 dfs = {
-    ("det", "low"): all_det_low,
-    ("robust", "low"): all_robust_low,
+       ("det", "low"):  all_det_low,
+       ("cc", "low"):   all_robust_low,
     ("det", "high"): all_det_high,
-    ("robust", "high"): all_robust_high,
+    ("cc", "high"):  all_robust_high,
+
 }
 
-df_long = pd.concat(
-    [
-        pd.DataFrame(
-            {"case": case_titles[(case, res)], "kpi": kpi, "value": df[kpi]}
-        )
-        for (case, res), df in dfs.items()
-        for kpi in kpis
-    ]
-)
+# --- Combine into long format ---
+all_data = []
+for (case, res), df in dfs.items():
+    for kpi in kpis:
+        temp = pd.DataFrame({
+            "case": case_titles[(case, res)],
+            "kpi": kpi,
+            "value": df[kpi]
+        })
+        all_data.append(temp)
 
+df_long = pd.concat(all_data)
+
+# --- Build figure ---
 fig = go.Figure()
+
 for kpi in kpis:
     kpi_df = df_long[df_long["kpi"] == kpi]
     fill, edge, label = kpi_colors[kpi]
-    fig.add_trace(
-        go.Box(
-            x=kpi_df["case"],
-            y=kpi_df["value"],
-            name=label,
-            marker_color=fill,
-            line=dict(color=edge, width=2),
-            boxmean=False,
-            legendgroup=kpi,
-            showlegend=True,
-            fillcolor=fill,
-        )
-    )
+    fig.add_trace(go.Box(
+        x=kpi_df["case"],
+        y=kpi_df["value"],
+        name=label,
+        marker_color=fill,
+        line=dict(color=edge, width=2),
+        boxmean=False,
+        legendgroup=kpi,
+        showlegend=True,
+        fillcolor=fill
+    ))
 
-# Layout & styling
+
+
+
+# --- Layout & styling ---
 fig.update_layout(
     template="plotly_white",
     font=dict(family="serif", size=36, color="black"),
-    boxmode="group",
+    boxmode='group',
     boxgap=0.4,
     boxgroupgap=0.15,
-    height=900,
-    width=1400,
-    margin=dict(l=120, r=250, t=100, b=180),
+    height=900, width=1400,
+    margin=dict(l=120, r=250, t=100, b=180),  # more space at bottom
     legend=dict(
         title="",
         font=dict(size=32, color="black"),
         orientation="h",
         x=0.5,
         y=1.1,
-        xanchor="center",
-        yanchor="top",
-        bordercolor="black",
-        borderwidth=0,
+        xanchor="center", yanchor="top",
+        bordercolor="black", borderwidth=0
     ),
     xaxis=dict(
         title="",
         tickfont=dict(size=32, color="black"),
         categoryorder="array",
         categoryarray=list(case_titles.values()),
-        showline=True,
-        linewidth=2,
-        linecolor="black",
+        showline=True, linewidth=2, linecolor="black",
         ticks="outside",
-        showgrid=False,
+        showgrid=False
     ),
     yaxis=dict(
         title="Cost [€]",
         tickfont=dict(size=32, color="black"),
         title_font=dict(size=38, color="black"),
-        showline=True,
-        linewidth=2,
-        linecolor="black",
+        showline=True, linewidth=2, linecolor="black",
         ticks="outside",
-        showgrid=True,
-        gridcolor="lightgrey",
-        gridwidth=1,
-        griddash="dash",
-    ),
+        showgrid=True, gridcolor="lightgrey", gridwidth=1, griddash="dash"
+    )
 )
 
-# Annotate RES groups
-fig.add_annotation(x=0.84, y=-0.18, xref="paper", yref="paper",
-                   text="High RES", showarrow=False,
-                   font=dict(size=34, family="serif"))
-fig.add_annotation(x=0.16, y=-0.18, xref="paper", yref="paper",
-                   text="Low RES", showarrow=False,
-                   font=dict(size=34, family="serif"))
+# --- Add just High/Low RES beneath ---
+fig.add_annotation(
+    x=0.84, y=-0.18, xref="paper", yref="paper",
+    text="High RES", showarrow=False,
+    font=dict(size=34, family="serif")
+)
+fig.add_annotation(
+    x=0.16, y=-0.18, xref="paper", yref="paper",
+    text="Low RES", showarrow=False,
+    font=dict(size=34, family="serif")
+)
 
-# Group lines
+# optional line to group visually
 fig.add_shape(type="line", x0=0.05, x1=0.45, y0=-0.10, y1=-0.10,
               xref="paper", yref="paper", line=dict(color="black", width=2))
 fig.add_shape(type="line", x0=0.55, x1=0.95, y0=-0.10, y1=-0.10,
               xref="paper", yref="paper", line=dict(color="black", width=2))
-
-fig.show()
