@@ -117,7 +117,9 @@ class InputLoader:
         nodes["Pd"] = loads
         nodes["slack"] = False
 
-        # ⚠ Hard-coded slack bus (DE0 0)
+        nodes.loc[nodes.zone=='LU','zone'] = 'DE'
+
+        # Hard-coded slack bus (DE0 0)
         if "DE0 0" in nodes.index:
             nodes.loc["DE0 0", "slack"] = True
         else:
